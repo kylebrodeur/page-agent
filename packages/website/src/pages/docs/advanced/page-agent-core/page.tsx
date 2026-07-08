@@ -222,6 +222,23 @@ const result = await agent.execute('Fill in the form with test data')`}
 								: 'Custom tools to extend or override built-in tools. Set to null to remove a tool.',
 						},
 						{
+							name: 'confirmAllMCP',
+							type: 'boolean',
+							defaultValue: 'false',
+							status: 'experimental',
+							description: isZh
+								? '在每次工具调用前要求确认。适用于需要人工确认所有桥接能力调用的宿主。'
+								: 'Require confirmation before every tool call. Useful when a host bridge wants a human gate around all ability or MCP-style calls.',
+						},
+						{
+							name: 'onConfirmTool',
+							type: '(request, options?) => Promise<boolean>',
+							status: 'experimental',
+							description: isZh
+								? '当工具需要确认时调用。返回 true 继续执行，返回 false 取消；实现应响应 options.signal 的 abort。'
+								: 'Called when a tool requires confirmation. Return true to continue, false to cancel; implementations should reject when options.signal aborts.',
+						},
+						{
 							name: 'instructions',
 							type: 'InstructionsConfig',
 							description: isZh
@@ -460,6 +477,25 @@ const result = await agent.execute('Fill in the form with test data')`}
   | { type: 'executed'; tool: string; input: unknown; output: string; duration: number }
   | { type: 'retrying'; attempt: number; maxAttempts: number }
   | { type: 'error'; message: string }`}
+				/>
+			</section>
+
+			<section className="mb-10">
+				<Heading id="toolconfirmationrequest">ToolConfirmationRequest</Heading>
+				<p className="text-gray-600 dark:text-gray-400 mb-4">
+					{isZh
+						? '宿主桥接层可以使用该请求渲染自己的确认 UI，并在 customFetch 中携带 nonce、事件 JWT 或 Cookie 凭证。PageAgent 不会生成或保存这些凭证。'
+						: 'Host bridges can use this request to render their own confirmation UI, then attach nonce, event JWT, or cookie credentials in customFetch. PageAgent does not mint or store those credentials.'}
+				</p>
+				<CodeEditor
+					language="typescript"
+					code={`interface ToolConfirmationRequest {
+  toolName: string
+  input: unknown
+  label: string
+  destructive: boolean
+  confirmAll: boolean
+}`}
 				/>
 			</section>
 

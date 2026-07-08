@@ -225,13 +225,28 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 					)}
 				</p>
 				<CodeEditor
-					code={`const agent = new PageAgent({
+					code={`const agent = new PageAgentCore({
+  pageController,
   baseURL: '/api/llm-proxy',
   model: 'gpt-5.1',
-  customFetch: (url, init) =>
-    fetch(url, { ...init, credentials: 'include' }),
+  apiKey: '', // keep the provider key on your server, never in the browser
+  customFetch: (url, init) => {
+    const headers = new Headers(init?.headers)
+    headers.set('X-App-Nonce', bridge.nonce)
+    headers.set('Authorization', \`Bearer \${bridge.eventJwt}\`)
+    return fetch(url, {
+      ...init,
+      credentials: 'include',
+      headers,
+    })
+  },
 });`}
 				/>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mt-4">
+					{isZh
+						? '在这种模式下，桥接层提供 baseURL/model/customFetch，后端验证 nonce、事件 JWT 或 Cookie，并在服务端读取真实 provider API Key。PageAgent 仍然只发送 OpenAI-compatible /chat/completions 请求。'
+						: 'In this mode, the bridge provides baseURL/model/customFetch. Your backend validates the nonce, event JWT, or cookie, then reads the real provider API key server-side. PageAgent still sends an OpenAI-compatible /chat/completions request.'}
+				</p>
 				<div className="mt-4 bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-500 p-4 rounded-r-lg">
 					<p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
 						{isZh

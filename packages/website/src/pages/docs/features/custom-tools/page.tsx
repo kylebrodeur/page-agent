@@ -108,6 +108,74 @@ const pageAgent = new PageAgent({
 						language="javascript"
 					/>
 				</section>
+
+				<section>
+					<Heading id="tool-policy" className="text-2xl font-bold mb-4">
+						{isZh ? '工具策略与确认' : 'Tool Policy & Confirmation'}
+					</Heading>
+					<p className="text-gray-600 dark:text-gray-300 mb-4">
+						{isZh
+							? '宿主应用可以在工具执行前进行权限检查和确认。PageAgent 只调用你提供的回调；nonce、事件 JWT、Cookie 和服务端 API Key 应由桥接层或后端代理管理。服务端仍必须验证每次写入。'
+							: 'Host apps can gate and confirm tools before execution. PageAgent only calls your callbacks; nonces, event JWTs, cookies, and server-side provider keys should be managed by the bridge or backend proxy. The server must still authorize every write.'}
+					</p>
+					<CodeEditor
+						code={`const agent = new PageAgentCore({
+  pageController,
+  baseURL: '/wp-json/wpaos/v1/llm-proxy',
+  model: 'gpt-5.1',
+  apiKey: '', // provider key stays server-side
+  confirmAllMCP: true,
+  customFetch: (url, init) => {
+    const headers = new Headers(init?.headers)
+    headers.set('X-WP-Nonce', window.wpaosBridge.nonce)
+    headers.set('Authorization', \`Bearer \${window.wpaosBridge.eventJwt}\`)
+    return fetch(url, {
+      ...init,
+      credentials: 'include',
+      headers,
+    })
+  },
+  onConfirmTool: async (request, { signal } = {}) => {
+    return showHostModal({
+      title: request.label,
+      body: JSON.stringify(request.input, null, 2),
+      destructive: request.destructive,
+      signal,
+    })
+  },
+  customTools: {
+    update_block: tool({
+      description: 'Update a block in the current page draft.',
+      inputSchema: updateBlockSchema,
+      canRun: async (_input, { signal }) => {
+        const res = await fetch('/wp-json/wpaos/v1/can-build', {
+          credentials: 'include',
+          headers: { 'X-WP-Nonce': window.wpaosBridge.nonce },
+          signal,
+        })
+        return res.ok || 'builder role required'
+      },
+      destructive: true,
+      confirmationLabel: (input) => \`Update block \${input.uid}\`,
+      execute: async (input, { signal }) => {
+        const res = await fetch('/wp-json/wpaos/v1/update-block', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': window.wpaosBridge.nonce,
+          },
+          body: JSON.stringify(input),
+          signal,
+        })
+        return await res.text()
+      },
+    }),
+  },
+})`}
+						language="typescript"
+					/>
+				</section>
 			</div>
 		</div>
 	)
