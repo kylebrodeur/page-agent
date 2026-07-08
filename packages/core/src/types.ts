@@ -49,6 +49,22 @@ export interface AgentConfig extends LLMConfig {
 	customTools?: Record<string, PageAgentTool | null>
 
 	/**
+	 * Require confirmation before every tool call.
+	 * Useful for hosts that want a human gate around all MCP/custom tool actions.
+	 */
+	confirmAllMCP?: boolean
+
+	/**
+	 * Called when a tool requires confirmation before execution.
+	 * Return true to allow the tool call, false to cancel it.
+	 * Implementations should reject the promise when options.signal aborts.
+	 */
+	onConfirmTool?: (
+		request: ToolConfirmationRequest,
+		options?: { signal: AbortSignal }
+	) => Promise<boolean>
+
+	/**
 	 * Instructions to guide the agent's behavior
 	 */
 	instructions?: {
@@ -158,6 +174,17 @@ export interface AgentConfig extends LLMConfig {
 	 * @default 0.4
 	 */
 	stepDelay?: number
+}
+
+/**
+ * Tool confirmation request passed to AgentConfig.onConfirmTool.
+ */
+export interface ToolConfirmationRequest {
+	toolName: string
+	input: unknown
+	label: string
+	destructive: boolean
+	confirmAll: boolean
 }
 
 /**

@@ -22,6 +22,9 @@ export interface PageAgentTool<TParams = any> {
 	// name: string
 	description: string
 	inputSchema: z.ZodType<TParams>
+	canRun?: (args: TParams, ctx: ToolContext) => boolean | string | Promise<boolean | string>
+	destructive?: boolean | ((args: TParams, ctx: ToolContext) => boolean | Promise<boolean>)
+	confirmationLabel?: string | ((args: TParams, ctx: ToolContext) => string | Promise<string>)
 	execute: (this: PageAgentCore, args: TParams, ctx: ToolContext) => Promise<string>
 }
 
