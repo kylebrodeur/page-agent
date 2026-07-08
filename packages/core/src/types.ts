@@ -25,7 +25,7 @@ export interface AgentConfig extends LLMConfig {
 	 * @example
 	 * // override internal tool
 	 * import { z } from 'zod/v4'
-	 * import { tool } from 'page-agent'
+	 * import { tool } from '@kylebrodeur/page-agent-core'
 	 * const customTools = {
 	 * ask_user: tool({
 	 * 	description:
