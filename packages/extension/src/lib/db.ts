@@ -1,4 +1,4 @@
-import type { HistoricalEvent } from '@page-agent/core'
+import type { HistoricalEvent } from '@kylebrodeur/page-agent-core'
 import { type DBSchema, type IDBPDatabase, openDB } from 'idb'
 
 const DB_NAME = 'page-agent-ext'

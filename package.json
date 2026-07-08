@@ -26,13 +26,13 @@
         "npm": "^11.6.3"
     },
     "scripts": {
-        "start": "npm run dev --workspace=@page-agent/website",
-        "dev:ext": "npm run dev -w @page-agent/ext",
-        "dev:demo": "npm run dev:demo --workspace=page-agent",
+        "start": "npm run dev --workspace=@kylebrodeur/page-agent-website",
+        "dev:ext": "npm run dev -w @kylebrodeur/page-agent-ext",
+        "dev:demo": "npm run dev:demo --workspace=@kylebrodeur/page-agent",
         "build": "node scripts/build.js",
         "build:libs": "node scripts/build-libs.js",
-        "build:website": "npm run build:website --workspace=@page-agent/website",
-        "build:ext": "npm run zip -w @page-agent/ext",
+        "build:website": "npm run build:website --workspace=@kylebrodeur/page-agent-website",
+        "build:ext": "npm run zip -w @kylebrodeur/page-agent-ext",
         "version": "node scripts/sync-version.js",
         "postpublish": "npm run postpublish --workspaces --if-present",
         "typecheck": "tsc --noEmit -p tsconfig.typecheck.json && tsc --noEmit -p packages/extension/tsconfig.json",

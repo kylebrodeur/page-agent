@@ -1,4 +1,4 @@
-import type { LLMConfig } from '@page-agent/llms'
+import type { LLMConfig } from '@kylebrodeur/page-agent-llms'
 
 // @note circular dependency but okay
 import type { PageAgentCore } from './PageAgentCore'
@@ -25,7 +25,7 @@ export interface AgentConfig extends LLMConfig {
 	 * @example
 	 * // override internal tool
 	 * import { z } from 'zod/v4'
-	 * import { tool } from 'page-agent'
+	 * import { tool } from '@kylebrodeur/page-agent'
 	 * const customTools = {
 	 * ask_user: tool({
 	 * 	description:

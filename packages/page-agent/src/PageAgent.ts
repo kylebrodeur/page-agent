@@ -2,11 +2,11 @@
  * Copyright (C) 2025 Alibaba Group Holding Limited
  * All rights reserved.
  */
-import { type AgentConfig, PageAgentCore } from '@page-agent/core'
-import { PageController, type PageControllerConfig } from '@page-agent/page-controller'
-import { Panel, type PanelConfig } from '@page-agent/ui'
+import { type AgentConfig, PageAgentCore } from '@kylebrodeur/page-agent-core'
+import { PageController, type PageControllerConfig } from '@kylebrodeur/page-agent-page-controller'
+import { Panel, type PanelConfig } from '@kylebrodeur/page-agent-ui'
 
-export * from '@page-agent/core'
+export * from '@kylebrodeur/page-agent-core'
 
 export type PageAgentConfig = AgentConfig & PageControllerConfig & Omit<PanelConfig, 'language'>
 

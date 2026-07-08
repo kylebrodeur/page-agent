@@ -51,7 +51,7 @@ export default function PageAgentDocs() {
 				<Heading id="basic-usage">{isZh ? '基本用法' : 'Basic Usage'}</Heading>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageAgent } from 'page-agent'
+					code={`import { PageAgent } from '@kylebrodeur/page-agent'
 
 const agent = new PageAgent({
   // LLM Configuration (required)

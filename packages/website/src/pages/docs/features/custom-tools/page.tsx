@@ -44,7 +44,7 @@ import { z } from 'zod/v4'`}
 
 					<CodeEditor
 						code={`import { z } from 'zod/v4'
-import { PageAgent, tool } from 'page-agent'
+import { PageAgent, tool } from '@kylebrodeur/page-agent'
 
 const pageAgent = new PageAgent({
   customTools: {

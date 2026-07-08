@@ -1,4 +1,4 @@
-import type { LLMConfig } from '@page-agent/llms'
+import type { LLMConfig } from '@kylebrodeur/page-agent-llms'
 
 // Demo LLM for testing
 export const DEMO_MODEL = 'qwen3.5-plus'

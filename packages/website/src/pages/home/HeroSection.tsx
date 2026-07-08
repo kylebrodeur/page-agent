@@ -1,4 +1,4 @@
-import type { PageAgent as PageAgentType } from 'page-agent'
+import type { PageAgent as PageAgentType } from '@kylebrodeur/page-agent'
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'wouter'
 
@@ -15,7 +15,7 @@ import {
 } from '../../constants'
 import { useLanguage } from '../../i18n/context'
 
-let pageAgentModule: Promise<typeof import('page-agent')> | null = null
+let pageAgentModule: Promise<typeof import('@kylebrodeur/page-agent')> | null = null
 
 /**
  * Get the bookmarklet injection script
@@ -65,7 +65,7 @@ export default function HeroSection() {
 
 	const [ready, setReady] = useState(false)
 	useEffect(() => {
-		pageAgentModule ??= import('page-agent')
+		pageAgentModule ??= import('@kylebrodeur/page-agent')
 		pageAgentModule.then(() => setReady(true))
 	}, [])
 

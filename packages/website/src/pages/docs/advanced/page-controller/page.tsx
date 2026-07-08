@@ -28,7 +28,7 @@ export default function PageControllerDocs() {
 				</p>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageAgent } from 'page-agent'
+					code={`import { PageAgent } from '@kylebrodeur/page-agent'
 
 const agent = new PageAgent({
   baseURL: 'https://api.openai.com/v1',
@@ -47,8 +47,8 @@ const agent = new PageAgent({
 				</p>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageAgentCore } from '@page-agent/core'
-import { PageController } from '@page-agent/page-controller'
+					code={`import { PageAgentCore } from '@kylebrodeur/page-agent-core'
+import { PageController } from '@kylebrodeur/page-agent-page-controller'
 
 const pageController = new PageController({
   enableMask: true,
@@ -270,8 +270,8 @@ const agent = new PageAgentCore({
 				</p>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageAgentCore } from '@page-agent/core'
-import type { PageController } from '@page-agent/page-controller'
+					code={`import { PageAgentCore } from '@kylebrodeur/page-agent-core'
+import type { PageController } from '@kylebrodeur/page-agent-page-controller'
 
 class PuppeteerPageController implements PageController {
   async getBrowserState() { /* ... */ }

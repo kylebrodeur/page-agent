@@ -28,12 +28,12 @@ This is a **monorepo** with npm workspaces.
 
 Published packages:
 
-- **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel (npm: `page-agent`)
-- **MCP** (`packages/mcp/`) - MCP server for browser control via Page Agent extension (npm: `@page-agent/mcp`)
-- **Core** (`packages/core/`) - Core agent logic without UI (npm: `@page-agent/core`)
-- **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
-- **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback, independent of LLM
-- **UI** (`packages/ui/`) - Panel and i18n, decoupled from PageAgent
+- **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel (npm: `@kylebrodeur/page-agent`)
+- **MCP** (`packages/mcp/`) - MCP server for browser control via Page Agent extension (npm: `@kylebrodeur/page-agent-mcp`)
+- **Core** (`packages/core/`) - Core agent logic without UI (npm: `@kylebrodeur/page-agent-core`)
+- **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model (npm: `@kylebrodeur/page-agent-llms`)
+- **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback, independent of LLM (npm: `@kylebrodeur/page-agent-page-controller`)
+- **UI** (`packages/ui/`) - Panel and i18n, decoupled from PageAgent (npm: `@kylebrodeur/page-agent-ui`)
 
 Applications:
 
@@ -41,6 +41,8 @@ Applications:
 - **Website** (`packages/website/`) - React docs, landing page, and dev playground (private)
 
 > Source-first monorepo with `npm workspaces + ts references + vite alias`. Library `package.json` exports point to `src/*.ts` during development, and point to `dist/*.js` when published. `workspaces` in root `package.json` must be in topological order.
+
+For WPAOS bridge usage, runtime policy, and scoped publishing steps, see [WPAOS Page-Agent Runtime](./WPAOS-PAGE-AGENT-RUNTIME.md).
 
 ## 🤖 AGENTS.md Alias
 

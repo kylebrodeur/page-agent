@@ -1,4 +1,4 @@
-import type { AgentStatus } from '@page-agent/core'
+import type { AgentStatus } from '@kylebrodeur/page-agent-core'
 import { Motion } from 'ai-motion'
 import { BookOpen, Globe } from 'lucide-react'
 import { useEffect, useRef } from 'react'

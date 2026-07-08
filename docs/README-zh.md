@@ -55,28 +55,28 @@
 
 ```html
 <script
-    src="https://cdn.jsdelivr.net/npm/page-agent@1.11.0/dist/iife/page-agent.demo.js"
+    src="https://cdn.jsdelivr.net/npm/@kylebrodeur/page-agent@1.11.0/dist/iife/page-agent.demo.js"
     crossorigin="anonymous"
 ></script>
 ```
 
 > **⚠️ 仅用于技术评估。** 该 Demo CDN 使用了免费的[测试 LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api)，使用即表示您同意其[条款](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md)。
 
-| Mirrors | URL                                                                                 |
-| ------- | ----------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.11.0/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.11.0/files/dist/iife/page-agent.demo.js |
+| Mirrors | URL                                                                                              |
+| ------- | ------------------------------------------------------------------------------------------------ |
+| Global  | https://cdn.jsdelivr.net/npm/@kylebrodeur/page-agent@1.11.0/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/@kylebrodeur/page-agent/1.11.0/files/dist/iife/page-agent.demo.js |
 
 在 URL 后添加 `?autoInit=false` 可只加载脚本，不自动创建 Demo Agent；之后可通过 `new window.PageAgent(...)` 手动初始化。
 
 ### NPM 安装
 
 ```bash
-npm install page-agent
+npm install @kylebrodeur/page-agent
 ```
 
 ```javascript
-import { PageAgent } from 'page-agent'
+import { PageAgent } from '@kylebrodeur/page-agent'
 
 const agent = new PageAgent({
     model: 'qwen3.5-plus',

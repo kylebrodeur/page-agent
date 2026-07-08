@@ -91,9 +91,9 @@ export default function QuickStart() {
 						{isZh ? '📦 NPM 安装（推荐）' : '📦 NPM Install (Recommended)'}
 					</h3>
 					<CodeEditor
-						code={`// npm install page-agent
+						code={`// npm install @kylebrodeur/page-agent
 
-import { PageAgent } from 'page-agent'`}
+import { PageAgent } from '@kylebrodeur/page-agent'`}
 						language="bash"
 					/>
 				</div>

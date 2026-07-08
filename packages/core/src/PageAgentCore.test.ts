@@ -1,4 +1,4 @@
-import type { BrowserState, PageController } from '@page-agent/page-controller'
+import type { BrowserState, PageController } from '@kylebrodeur/page-agent-page-controller'
 import { describe, expect, it, vi } from 'vitest'
 import * as z from 'zod/v4'
 

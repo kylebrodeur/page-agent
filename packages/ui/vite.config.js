@@ -8,7 +8,7 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-console.log(chalk.cyan(`📦 Building @page-agent/ui`))
+console.log(chalk.cyan(`📦 Building @kylebrodeur/page-agent-ui`))
 
 export default defineConfig({
 	clearScreen: false,

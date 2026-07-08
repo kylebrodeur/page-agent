@@ -44,8 +44,8 @@ export default function PageAgentCoreDocs() {
 				<Heading id="basic-usage">{isZh ? '基本用法' : 'Basic Usage'}</Heading>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageAgentCore } from '@page-agent/core'
-import { PageController } from '@page-agent/page-controller'
+					code={`import { PageAgentCore } from '@kylebrodeur/page-agent-core'
+import { PageController } from '@kylebrodeur/page-agent-page-controller'
 
 const agent = new PageAgentCore({
   pageController: new PageController({ enableMask: true }),

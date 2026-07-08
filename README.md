@@ -56,28 +56,28 @@ Fastest way to try PageAgent with our free Demo LLM:
 
 ```html
 <script
-    src="https://cdn.jsdelivr.net/npm/page-agent@1.11.0/dist/iife/page-agent.demo.js"
+    src="https://cdn.jsdelivr.net/npm/@kylebrodeur/page-agent@1.11.0/dist/iife/page-agent.demo.js"
     crossorigin="anonymous"
 ></script>
 ```
 
 > **⚠️ For technical evaluation only.** This demo CDN uses our free [testing LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api). By using it, you agree to its [terms](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md).
 
-| Mirrors | URL                                                                                 |
-| ------- | ----------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.11.0/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.11.0/files/dist/iife/page-agent.demo.js |
+| Mirrors | URL                                                                                              |
+| ------- | ------------------------------------------------------------------------------------------------ |
+| Global  | https://cdn.jsdelivr.net/npm/@kylebrodeur/page-agent@1.11.0/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/@kylebrodeur/page-agent/1.11.0/files/dist/iife/page-agent.demo.js |
 
 Add `?autoInit=false` to load the script without creating the demo agent automatically. You can then instantiate it with `new window.PageAgent(...)`.
 
 ### NPM Installation
 
 ```bash
-npm install page-agent
+npm install @kylebrodeur/page-agent
 ```
 
 ```javascript
-import { PageAgent } from 'page-agent'
+import { PageAgent } from '@kylebrodeur/page-agent'
 
 const agent = new PageAgent({
     model: 'qwen3.5-plus',
