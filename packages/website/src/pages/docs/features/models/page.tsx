@@ -230,16 +230,16 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
   baseURL: '/api/llm-proxy',
   model: 'gpt-5.1',
   apiKey: '', // keep the provider key on your server, never in the browser
-  customFetch: (url, init) =>
-    fetch(url, {
+  customFetch: (url, init) => {
+    const headers = new Headers(init?.headers)
+    headers.set('X-App-Nonce', bridge.nonce)
+    headers.set('Authorization', \`Bearer \${bridge.eventJwt}\`)
+    return fetch(url, {
       ...init,
       credentials: 'include',
-      headers: {
-        ...(init?.headers || {}),
-        'X-App-Nonce': bridge.nonce,
-        Authorization: \`Bearer \${bridge.eventJwt}\`,
-      },
-    }),
+      headers,
+    })
+  },
 });`}
 				/>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mt-4">

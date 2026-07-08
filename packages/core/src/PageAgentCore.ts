@@ -9,7 +9,7 @@ import chalk from 'chalk'
 import * as z from 'zod/v4'
 
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
-import { tools, type PageAgentTool, type ToolContext } from './tools'
+import { type PageAgentTool, type ToolContext, tools } from './tools'
 import type {
 	AgentActivity,
 	AgentConfig,
@@ -518,9 +518,9 @@ export class PageAgentCore extends EventTarget {
 		}
 
 		if (!this.config.onConfirmTool) {
-			const message = `Tool "${toolName}" requires confirmation, but no confirmation handler is configured.`
-			this.#emitActivity({ type: 'error', message })
-			return message
+			throw new Error(
+				`Tool "${toolName}" requires confirmation, but no confirmation handler is configured.`
+			)
 		}
 
 		const confirmed = await this.config.onConfirmTool(request, { signal: ctx.signal })

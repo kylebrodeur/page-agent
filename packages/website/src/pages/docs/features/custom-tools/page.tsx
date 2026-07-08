@@ -125,16 +125,16 @@ const pageAgent = new PageAgent({
   model: 'gpt-5.1',
   apiKey: '', // provider key stays server-side
   confirmAllMCP: true,
-  customFetch: (url, init) =>
-    fetch(url, {
+  customFetch: (url, init) => {
+    const headers = new Headers(init?.headers)
+    headers.set('X-WP-Nonce', window.wpaosBridge.nonce)
+    headers.set('Authorization', \`Bearer \${window.wpaosBridge.eventJwt}\`)
+    return fetch(url, {
       ...init,
       credentials: 'include',
-      headers: {
-        ...(init?.headers || {}),
-        'X-WP-Nonce': window.wpaosBridge.nonce,
-        Authorization: \`Bearer \${window.wpaosBridge.eventJwt}\`,
-      },
-    }),
+      headers,
+    })
+  },
   onConfirmTool: async (request, { signal } = {}) => {
     return showHostModal({
       title: request.label,

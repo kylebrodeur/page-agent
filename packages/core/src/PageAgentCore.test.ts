@@ -547,6 +547,32 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 			})
 		})
 
+		it('fails the task when confirmation is required without a confirmation handler', async () => {
+			const execute = vi.fn(async () => 'should not run')
+			const fetchMock = createFetchMock().mockResolvedValueOnce(
+				agentResponse({ action: { update_record: { id: 'post-1' } } })
+			)
+			const agent = createAgent(fetchMock, {
+				confirmAllMCP: true,
+				customTools: {
+					update_record: tool({
+						description: 'Update a record.',
+						inputSchema: z.object({ id: z.string() }),
+						execute,
+					}),
+				},
+			})
+
+			const result = await agent.execute('update a record')
+
+			expect(execute).not.toHaveBeenCalled()
+			expect(result).toMatchObject({
+				success: false,
+				data: 'InvokeError: Tool execution failed: Tool "update_record" requires confirmation, but no confirmation handler is configured.',
+			})
+			expect(agent.status).toBe('error')
+		})
+
 		it('aborts pending confirmation when stopped', async () => {
 			let confirmSignal!: AbortSignal
 			let notifyConfirmationStarted!: () => void
