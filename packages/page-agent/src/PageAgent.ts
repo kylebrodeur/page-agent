@@ -2,17 +2,21 @@
  * Copyright (C) 2025 Alibaba Group Holding Limited
  * All rights reserved.
  */
-import { type AgentConfig, PageAgentCore } from '@page-agent/core'
-import { PageController, type PageControllerConfig } from '@page-agent/page-controller'
-import { Panel, type PanelConfig } from '@page-agent/ui'
+import { type AgentConfig, PageAgentCore } from '@kylebrodeur/page-agent-core'
+import { PageController, type PageControllerConfig } from '@kylebrodeur/page-agent-page-controller'
 
-export * from '@page-agent/core'
+export * from '@kylebrodeur/page-agent-core'
 
-export type PageAgentConfig = AgentConfig & PageControllerConfig & Omit<PanelConfig, 'language'>
+export type PageAgentConfig = AgentConfig & PageControllerConfig
 
+/**
+ * Headless PageAgent entry point.
+ *
+ * This class combines PageAgentCore with the default PageController. It does
+ * not include the built-in UI Panel, so it can be used with any framework
+ * (Arrow.js, vanilla JS, React, etc.) without pulling in UI dependencies.
+ */
 export class PageAgent extends PageAgentCore {
-	panel: Panel
-
 	constructor(config: PageAgentConfig) {
 		const pageController = new PageController({
 			...config,
@@ -20,10 +24,5 @@ export class PageAgent extends PageAgentCore {
 		})
 
 		super({ ...config, pageController })
-
-		this.panel = new Panel(this, {
-			language: config.language,
-			promptForNextTask: config.promptForNextTask,
-		})
 	}
 }

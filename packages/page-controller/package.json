@@ -1,5 +1,5 @@
 {
-    "name": "@page-agent/page-controller",
+    "name": "@kylebrodeur/page-agent-page-controller",
     "version": "1.11.0",
     "type": "module",
     "main": "./src/PageController.ts",
@@ -36,10 +36,10 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/alibaba/page-agent.git",
+        "url": "https://github.com/kylebrodeur/page-agent.git",
         "directory": "packages/page-controller"
     },
-    "homepage": "https://alibaba.github.io/page-agent/",
+    "homepage": "https://github.com/kylebrodeur/page-agent",
     "scripts": {
         "build": "vite build",
         "test": "vitest run",

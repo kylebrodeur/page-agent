@@ -25,7 +25,6 @@ const DEMO_API_KEY = 'NA'
 if (autoInit) {
 	setTimeout(() => {
 		let config: PageAgentConfig
-		let showPanel = true
 
 		if (currentScriptURL) {
 			const url = currentScriptURL
@@ -33,7 +32,6 @@ if (autoInit) {
 			const baseURL = url.searchParams.get('baseURL') || DEMO_BASE_URL
 			const apiKey = url.searchParams.get('apiKey') || DEMO_API_KEY
 			const language = (url.searchParams.get('lang') as 'zh-CN' | 'en-US') || 'zh-CN'
-			showPanel = ((url.searchParams.get('showPanel') as 'true' | 'false') || 'true') === 'true'
 			config = { model, baseURL, apiKey, language }
 		} else {
 			console.log('🚀 page-agent.js no current script detected, using default demo config')
@@ -46,9 +44,6 @@ if (autoInit) {
 
 		// Create agent
 		window.pageAgent = new PageAgent(config)
-		if (showPanel) {
-			window.pageAgent.panel.show()
-		}
 
 		console.log('🚀 page-agent.js initialized with config:', window.pageAgent.config)
 	})

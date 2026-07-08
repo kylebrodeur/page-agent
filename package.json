@@ -3,16 +3,6 @@
     "private": true,
     "version": "1.11.0",
     "type": "module",
-    "workspaces": [
-        "packages/page-controller",
-        "packages/ui",
-        "packages/llms",
-        "packages/core",
-        "packages/page-agent",
-        "packages/mcp",
-        "packages/extension",
-        "packages/website"
-    ],
     "description": "AI-powered UI agent for web applications",
     "author": "Simon<gaomeng1900>",
     "license": "MIT",
@@ -21,22 +11,24 @@
         "url": "https://github.com/alibaba/page-agent.git"
     },
     "homepage": "https://alibaba.github.io/page-agent/",
+    "packageManager": "pnpm@11.7.0",
     "engines": {
         "node": "^22.22.1 || >=24",
-        "npm": "^11.6.3"
+        "pnpm": "^11.7.0"
     },
     "scripts": {
-        "start": "npm run dev --workspace=@page-agent/website",
-        "dev:ext": "npm run dev -w @page-agent/ext",
-        "dev:demo": "npm run dev:demo --workspace=page-agent",
-        "build": "node scripts/build.js",
-        "build:libs": "node scripts/build-libs.js",
-        "build:website": "npm run build:website --workspace=@page-agent/website",
-        "build:ext": "npm run zip -w @page-agent/ext",
+        "start": "pnpm --filter @kylebrodeur/page-agent-website dev",
+        "dev:ext": "pnpm --filter @kylebrodeur/page-agent-ext dev",
+        "dev:demo": "pnpm --filter @kylebrodeur/page-agent dev:demo",
+        "build": "pnpm run cleanup && pnpm -r --if-present run build && pnpm run build:website && pnpm run build:ext",
+        "build:libs": "pnpm -r --if-present run build",
+        "build:website": "pnpm --filter @kylebrodeur/page-agent-website build:website",
+        "build:ext": "pnpm --filter @kylebrodeur/page-agent-ext zip",
         "version": "node scripts/sync-version.js",
-        "postpublish": "npm run postpublish --workspaces --if-present",
+        "postpublish": "pnpm -r --if-present run postpublish",
+        "publish:libs": "pnpm --filter @kylebrodeur/page-agent-llms publish --access public && pnpm --filter @kylebrodeur/page-agent-page-controller publish --access public && pnpm --filter @kylebrodeur/page-agent-ui publish --access public && pnpm --filter @kylebrodeur/page-agent-core publish --access public && pnpm --filter @kylebrodeur/page-agent publish --access public && pnpm --filter @kylebrodeur/page-agent-mcp publish --access public",
         "typecheck": "tsc --noEmit -p tsconfig.typecheck.json && tsc --noEmit -p packages/extension/tsconfig.json",
-        "test": "npm test --workspaces --if-present",
+        "test": "pnpm -r --if-present run test",
         "lint": "eslint .",
         "ci": "node scripts/ci.js",
         "cleanup": "rm -rf packages/*/dist && rm -rf packages/*/.output",
@@ -73,18 +65,18 @@
     },
     "lint-staged": {
         "*.{js,ts,cjs,cts,mjs,mts}": [
-            "npx prettier --write --ignore-unknown",
-            "npx eslint --quiet"
+            "pnpm exec prettier --write --ignore-unknown",
+            "pnpm exec eslint --quiet"
         ],
         "*.{jsx,tsx}": [
-            "npx prettier --write --ignore-unknown",
-            "npx eslint --quiet"
+            "pnpm exec prettier --write --ignore-unknown",
+            "pnpm exec eslint --quiet"
         ],
         "*.css": [
-            "npx prettier --write --ignore-unknown"
+            "pnpm exec prettier --write --ignore-unknown"
         ],
         "*.md": [
-            "npx prettier --write --ignore-unknown"
+            "pnpm exec prettier --write --ignore-unknown"
         ]
     },
     "commitlint": {

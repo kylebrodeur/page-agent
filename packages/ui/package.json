@@ -1,5 +1,5 @@
 {
-    "name": "@page-agent/ui",
+    "name": "@kylebrodeur/page-agent-ui",
     "version": "1.11.0",
     "type": "module",
     "main": "./src/index.ts",
@@ -36,10 +36,10 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/alibaba/page-agent.git",
+        "url": "https://github.com/kylebrodeur/page-agent.git",
         "directory": "packages/ui"
     },
-    "homepage": "https://alibaba.github.io/page-agent/",
+    "homepage": "https://github.com/kylebrodeur/page-agent",
     "scripts": {
         "build": "vite build",
         "prepublishOnly": "node ../../scripts/pre-publish.js",

@@ -39,7 +39,7 @@ export default defineConfig({
 				'zod',
 				'zod/v4',
 				// all the internal packages
-				/^@page-agent\//,
+				/^@kylebrodeur\/page-agent-/,
 			],
 		},
 		minify: false,

@@ -1,0 +1,15 @@
+packages:
+  - packages/page-controller
+  - packages/ui
+  - packages/llms
+  - packages/core
+  - packages/page-agent
+  - packages/mcp
+  - packages/extension
+  - packages/website
+
+ignoreScripts: false
+
+onlyBuiltDependencies:
+  - esbuild
+  - spawn-sync

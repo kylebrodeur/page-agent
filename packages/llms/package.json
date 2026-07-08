@@ -1,5 +1,5 @@
 {
-    "name": "@page-agent/llms",
+    "name": "@kylebrodeur/page-agent-llms",
     "version": "1.11.0",
     "type": "module",
     "main": "./src/index.ts",
@@ -37,10 +37,10 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/alibaba/page-agent.git",
+        "url": "https://github.com/kylebrodeur/page-agent.git",
         "directory": "packages/llms"
     },
-    "homepage": "https://alibaba.github.io/page-agent/",
+    "homepage": "https://github.com/kylebrodeur/page-agent",
     "scripts": {
         "build": "vite build",
         "test": "vitest run",
