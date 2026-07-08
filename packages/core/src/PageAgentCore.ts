@@ -9,7 +9,7 @@ import chalk from 'chalk'
 import * as z from 'zod/v4'
 
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
-import { tools } from './tools'
+import { tools, type PageAgentTool, type ToolContext } from './tools'
 import type {
 	AgentActivity,
 	AgentConfig,
@@ -20,6 +20,7 @@ import type {
 	HistoricalEvent,
 	MacroToolInput,
 	MacroToolResult,
+	ToolConfirmationRequest,
 } from './types'
 import { assert, fetchLlmsTxt, normalizeResponse, suppress, uid, waitFor } from './utils'
 
@@ -430,6 +431,16 @@ export class PageAgentCore extends EventTarget {
 				const tool = tools.get(toolName)
 				assert(tool, `Tool ${toolName} not found`)
 
+				const toolPolicyResult = await this.#checkToolPolicy(toolName, tool, toolInput, {
+					signal,
+				})
+				if (toolPolicyResult) {
+					return {
+						input,
+						output: toolPolicyResult,
+					}
+				}
+
 				console.log(chalk.blue.bold(`Executing tool: ${toolName}`), toolInput)
 
 				// Emit executing activity
@@ -467,6 +478,86 @@ export class PageAgentCore extends EventTarget {
 				}
 			},
 		}
+	}
+
+	async #checkToolPolicy(
+		toolName: string,
+		tool: PageAgentTool,
+		toolInput: unknown,
+		ctx: ToolContext
+	): Promise<string | null> {
+		ctx.signal.throwIfAborted()
+
+		if (tool.canRun) {
+			const canRun = await tool.canRun(toolInput, ctx)
+			ctx.signal.throwIfAborted()
+
+			if (canRun !== true) {
+				const reason = typeof canRun === 'string' && canRun ? `: ${canRun}` : ''
+				const message = `Tool "${toolName}" was blocked${reason}.`
+				this.#emitActivity({ type: 'error', message })
+				return message
+			}
+		}
+
+		const destructive = await this.#isDestructiveTool(tool, toolInput, ctx)
+		ctx.signal.throwIfAborted()
+
+		const confirmAll = this.config.confirmAllMCP ?? false
+		if (!destructive && !confirmAll) return null
+
+		const label = await this.#getToolConfirmationLabel(toolName, tool, toolInput, ctx)
+		ctx.signal.throwIfAborted()
+
+		const request: ToolConfirmationRequest = {
+			toolName,
+			input: toolInput,
+			label,
+			destructive,
+			confirmAll,
+		}
+
+		if (!this.config.onConfirmTool) {
+			const message = `Tool "${toolName}" requires confirmation, but no confirmation handler is configured.`
+			this.#emitActivity({ type: 'error', message })
+			return message
+		}
+
+		const confirmed = await this.config.onConfirmTool(request, { signal: ctx.signal })
+		ctx.signal.throwIfAborted()
+
+		if (!confirmed) {
+			const message = `Tool "${toolName}" was cancelled by the user.`
+			this.#emitActivity({ type: 'error', message })
+			return message
+		}
+
+		return null
+	}
+
+	async #isDestructiveTool(
+		tool: PageAgentTool,
+		toolInput: unknown,
+		ctx: ToolContext
+	): Promise<boolean> {
+		if (typeof tool.destructive === 'function') {
+			return await tool.destructive(toolInput, ctx)
+		}
+
+		return tool.destructive ?? false
+	}
+
+	async #getToolConfirmationLabel(
+		toolName: string,
+		tool: PageAgentTool,
+		toolInput: unknown,
+		ctx: ToolContext
+	): Promise<string> {
+		if (typeof tool.confirmationLabel === 'function') {
+			return await tool.confirmationLabel(toolInput, ctx)
+		}
+
+		return tool.confirmationLabel ?? tool.description ?? toolName
 	}
 
 	/**

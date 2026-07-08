@@ -103,6 +103,12 @@ function waitResponse(seconds = 10): Response {
 	return agentResponse({ action: { wait: { seconds } } })
 }
 
+function getFirstStep(result: ExecutionResult) {
+	const step = result.history.find((event) => event.type === 'step')
+	expect(step).toBeDefined()
+	return step!
+}
+
 /**
  * Start a task that blocks on `wait`, returning once the tool is executing.
  * The running promise is wrapped so awaiting this helper does not await the task.
@@ -360,6 +366,228 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 
 			await expect(task).resolves.toMatchObject({ success: false, data: 'Task aborted' })
 			expect(agent.status).toBe('stopped')
+		})
+	})
+
+	describe('tool policy', () => {
+		it('blocks execution when canRun returns false', async () => {
+			const execute = vi.fn(async () => 'should not run')
+			const fetchMock = createFetchMock()
+				.mockResolvedValueOnce(agentResponse({ action: { guarded_tool: { value: 'secret' } } }))
+				.mockResolvedValueOnce(doneResponse('done'))
+			const agent = createAgent(fetchMock, {
+				customTools: {
+					guarded_tool: tool({
+						description: 'Requires extra permission.',
+						inputSchema: z.object({ value: z.string() }),
+						canRun: () => false,
+						execute,
+					}),
+				},
+			})
+
+			const result = await agent.execute('try guarded tool')
+
+			expect(execute).not.toHaveBeenCalled()
+			expect(getFirstStep(result)).toMatchObject({
+				type: 'step',
+				action: {
+					name: 'guarded_tool',
+					output: 'Tool "guarded_tool" was blocked.',
+				},
+			})
+		})
+
+		it('surfaces canRun denial reasons', async () => {
+			const execute = vi.fn(async () => 'should not run')
+			const fetchMock = createFetchMock()
+				.mockResolvedValueOnce(agentResponse({ action: { guarded_tool: { value: 'secret' } } }))
+				.mockResolvedValueOnce(doneResponse('done'))
+			const agent = createAgent(fetchMock, {
+				customTools: {
+					guarded_tool: tool({
+						description: 'Requires builder role.',
+						inputSchema: z.object({ value: z.string() }),
+						canRun: () => 'builder role required',
+						execute,
+					}),
+				},
+			})
+
+			const result = await agent.execute('try guarded tool')
+
+			expect(execute).not.toHaveBeenCalled()
+			expect(getFirstStep(result)).toMatchObject({
+				type: 'step',
+				action: {
+					output: 'Tool "guarded_tool" was blocked: builder role required.',
+				},
+			})
+		})
+
+		it('supports async canRun with tool input and abort signal', async () => {
+			const execute = vi.fn(async () => 'ran')
+			const canRun = vi.fn(async (_input: { value: string }, { signal }) => {
+				expect(_input).toEqual({ value: 'allowed' })
+				expect(signal).toBeInstanceOf(AbortSignal)
+				return true
+			})
+			const fetchMock = createFetchMock()
+				.mockResolvedValueOnce(agentResponse({ action: { guarded_tool: { value: 'allowed' } } }))
+				.mockResolvedValueOnce(doneResponse('done'))
+			const agent = createAgent(fetchMock, {
+				customTools: {
+					guarded_tool: tool({
+						description: 'Allows asynchronously.',
+						inputSchema: z.object({ value: z.string() }),
+						canRun,
+						execute,
+					}),
+				},
+			})
+
+			const result = await agent.execute('try guarded tool')
+
+			expect(canRun).toHaveBeenCalledOnce()
+			expect(execute).toHaveBeenCalledOnce()
+			expect(getFirstStep(result)).toMatchObject({
+				type: 'step',
+				action: { output: 'ran' },
+			})
+		})
+
+		it('requires confirmation for destructive tools', async () => {
+			const execute = vi.fn(async () => 'deleted')
+			const onConfirmTool = vi.fn(async () => true)
+			const fetchMock = createFetchMock()
+				.mockResolvedValueOnce(agentResponse({ action: { delete_record: { id: 'post-1' } } }))
+				.mockResolvedValueOnce(doneResponse('done'))
+			const agent = createAgent(fetchMock, {
+				onConfirmTool,
+				customTools: {
+					delete_record: tool({
+						description: 'Delete a record.',
+						inputSchema: z.object({ id: z.string() }),
+						destructive: true,
+						confirmationLabel: 'Delete post post-1',
+						execute,
+					}),
+				},
+			})
+
+			await agent.execute('delete a record')
+
+			expect(onConfirmTool).toHaveBeenCalledWith(
+				expect.objectContaining({
+					toolName: 'delete_record',
+					input: { id: 'post-1' },
+					label: 'Delete post post-1',
+					destructive: true,
+					confirmAll: false,
+				}),
+				expect.objectContaining({ signal: expect.any(AbortSignal) })
+			)
+			expect(execute).toHaveBeenCalledOnce()
+		})
+
+		it('requires confirmation for ordinary tools when confirmAllMCP is true', async () => {
+			const execute = vi.fn(async () => 'updated')
+			const onConfirmTool = vi.fn(async () => true)
+			const fetchMock = createFetchMock()
+				.mockResolvedValueOnce(agentResponse({ action: { update_record: { id: 'post-1' } } }))
+				.mockResolvedValueOnce(doneResponse('done'))
+			const agent = createAgent(fetchMock, {
+				confirmAllMCP: true,
+				onConfirmTool,
+				customTools: {
+					update_record: tool({
+						description: 'Update a record.',
+						inputSchema: z.object({ id: z.string() }),
+						execute,
+					}),
+				},
+			})
+
+			await agent.execute('update a record')
+
+			expect(onConfirmTool).toHaveBeenCalledWith(
+				expect.objectContaining({
+					toolName: 'update_record',
+					destructive: false,
+					confirmAll: true,
+				}),
+				expect.objectContaining({ signal: expect.any(AbortSignal) })
+			)
+			expect(execute).toHaveBeenCalledOnce()
+		})
+
+		it('does not execute when the user cancels confirmation', async () => {
+			const execute = vi.fn(async () => 'should not run')
+			const fetchMock = createFetchMock()
+				.mockResolvedValueOnce(agentResponse({ action: { update_record: { id: 'post-1' } } }))
+				.mockResolvedValueOnce(doneResponse('done'))
+			const agent = createAgent(fetchMock, {
+				confirmAllMCP: true,
+				onConfirmTool: async () => false,
+				customTools: {
+					update_record: tool({
+						description: 'Update a record.',
+						inputSchema: z.object({ id: z.string() }),
+						execute,
+					}),
+				},
+			})
+
+			const result = await agent.execute('update a record')
+
+			expect(execute).not.toHaveBeenCalled()
+			expect(getFirstStep(result)).toMatchObject({
+				type: 'step',
+				action: { output: 'Tool "update_record" was cancelled by the user.' },
+			})
+		})
+
+		it('aborts pending confirmation when stopped', async () => {
+			let confirmSignal!: AbortSignal
+			let notifyConfirmationStarted!: () => void
+			const confirmationStarted = new Promise<void>((resolve) => {
+				notifyConfirmationStarted = resolve
+			})
+			const execute = vi.fn(async () => 'should not run')
+			const fetchMock = createFetchMock().mockResolvedValueOnce(
+				agentResponse({ action: { update_record: { id: 'post-1' } } })
+			)
+			const agent = createAgent(fetchMock, {
+				confirmAllMCP: true,
+				onConfirmTool: (_request, { signal } = { signal: new AbortController().signal }) =>
+					new Promise<boolean>((_resolve, reject) => {
+						confirmSignal = signal
+						notifyConfirmationStarted()
+						signal.addEventListener('abort', () => reject(new Error('confirmation aborted')), {
+							once: true,
+						})
+					}),
+				customTools: {
+					update_record: tool({
+						description: 'Update a record.',
+						inputSchema: z.object({ id: z.string() }),
+						execute,
+					}),
+				},
+			})
+
+			const task = agent.execute('update a record')
+			const started = await Promise.race([
+				confirmationStarted.then(() => true),
+				new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 1000)),
+			])
+
+			expect(started).toBe(true)
+			await agent.stop()
+			await task
+
+			expect(confirmSignal.aborted).toBe(true)
+			expect(execute).not.toHaveBeenCalled()
 		})
 	})
 })

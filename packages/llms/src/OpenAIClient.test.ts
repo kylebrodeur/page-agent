@@ -117,6 +117,42 @@ describe('OpenAIClient.invoke — request construction', () => {
 		expect((init.headers as Record<string, string>).Authorization).toBeUndefined()
 	})
 
+	it('allows customFetch to add bridge auth while keeping provider apiKey out of the browser', async () => {
+		const bridgeFetch = vi.fn<typeof fetch>(async (url, init) => {
+			const headers = {
+				...(init?.headers as Record<string, string>),
+				Authorization: 'Bearer event-jwt',
+				'X-WP-Nonce': 'nonce-123',
+			}
+			return fetchMock(url, { ...init, credentials: 'include', headers })
+		})
+		const fetchMock = vi
+			.fn<typeof fetch>()
+			.mockResolvedValue(jsonResponse(toolCallBody('greet', { name: 'world' })))
+		const { client } = makeClient({ apiKey: '', customFetch: bridgeFetch })
+
+		await client.invoke([], tools, signal)
+
+		expect(bridgeFetch).toHaveBeenCalledWith(
+			'http://test.local/v1/chat/completions',
+			expect.objectContaining({
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+			})
+		)
+		expect(fetchMock).toHaveBeenCalledWith(
+			'http://test.local/v1/chat/completions',
+			expect.objectContaining({
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: 'Bearer event-jwt',
+					'X-WP-Nonce': 'nonce-123',
+				},
+			})
+		)
+	})
+
 	it('applies transformRequestBody (in-place form, returns undefined)', async () => {
 		const { client, fetchMock } = makeClient({
 			transformRequestBody: (body) => {
