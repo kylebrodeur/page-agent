@@ -4,11 +4,9 @@
 
 We provide security fixes on a best-effort basis for:
 
-| Version                                                   | Supported |
-| --------------------------------------------------------- | --------- |
-| `main`                                                    | Yes       |
-| Latest npm release of `page-agent` and workspace packages | Yes       |
-| Older releases                                            | No        |
+| `main`                                                          | Yes       |
+| Latest npm release of `@kylebrodeur/page-agent` and workspace packages | Yes       |
+| Older releases                                                  | No        |
 
 Please upgrade to the latest release before reporting an issue against an older build.
 

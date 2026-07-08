@@ -10,37 +10,37 @@ For contribution rules and expectations, see [../CONTRIBUTING.md](../CONTRIBUTIN
 
 1. **Prerequisites**
     - `macOS` / `Linux` / `WSL`
-    - `node.js ^22.13 || >=24` with `npm >= 11`
+    - `node.js ^22.22.1 || >=24` with `pnpm ^11.7.0`
     - An editor that supports `ts/eslint/prettier`
     - Make sure `eslint`, `prettier` and `commitlint` work well. Un-linted code won't pass the CI.
 
 2. **Setup**
 
     ```bash
-    npm i            # Or `npm ci` if you don't want to change the lockfile
-    npm start        # Start website dev server
-    npm run build    # Build everything
+    pnpm install     # Or `pnpm install --frozen-lockfile` if you don't want to change the lockfile
+    pnpm start       # Start website dev server
+    pnpm run build   # Build everything
     ```
 
 ## 📦 Project Structure
 
-This is a **monorepo** with npm workspaces.
+This is a **monorepo** with pnpm workspaces.
 
 Published packages:
 
-- **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel (npm: `page-agent`)
-- **MCP** (`packages/mcp/`) - MCP server for browser control via Page Agent extension (npm: `@page-agent/mcp`)
-- **Core** (`packages/core/`) - Core agent logic without UI (npm: `@page-agent/core`)
-- **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
-- **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback, independent of LLM
-- **UI** (`packages/ui/`) - Panel and i18n, decoupled from PageAgent
+- **Page Agent** (`packages/page-agent/`) - Main entry, headless by default. Combines Core + PageController (npm: `@kylebrodeur/page-agent`)
+- **Core** (`packages/core/`) - Core agent logic without UI (npm: `@kylebrodeur/page-agent-core`)
+- **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model (npm: `@kylebrodeur/page-agent-llms`)
+- **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback, independent of LLM (npm: `@kylebrodeur/page-agent-page-controller`)
+- **UI** (`packages/ui/`) - Optional Panel and i18n, decoupled from PageAgent (npm: `@kylebrodeur/page-agent-ui`)
+- **MCP** (`packages/mcp/`) - MCP server for browser control via Page Agent extension (npm: `@kylebrodeur/page-agent-mcp`)
 
 Applications:
 
 - **Extension** (`packages/extension/`) - Browser extension (WXT + React)
 - **Website** (`packages/website/`) - React docs, landing page, and dev playground (private)
 
-> Source-first monorepo with `npm workspaces + ts references + vite alias`. Library `package.json` exports point to `src/*.ts` during development, and point to `dist/*.js` when published. `workspaces` in root `package.json` must be in topological order.
+> Source-first monorepo with `pnpm workspaces + ts references + vite alias`. Library `package.json` exports point to `src/*.ts` during development, and point to `dist/*.js` when published. The order in `pnpm-workspace.yaml` should follow the topological build order.
 
 ## 🤖 AGENTS.md Alias
 
@@ -74,8 +74,8 @@ If your AI assistant does not support [AGENTS.md](https://agents.md/). Add an al
 ### Extension Development
 
 ```bash
-npm run dev:ext
-npm run build:ext
+pnpm run dev:ext
+pnpm run build:ext
 ```
 
 - Update `packages/extension/docs/extension_api.md` for API integration details

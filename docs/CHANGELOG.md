@@ -341,13 +341,13 @@ PageAgent is now ready for production use. The API is stable and breaking change
 
 ### Packages
 
-| Package                       | Description                        |
-| ----------------------------- | ---------------------------------- |
-| `page-agent`                  | Main entry with UI Panel           |
-| `@page-agent/core`            | Core agent logic without UI        |
-| `@page-agent/llms`            | LLM client with retry logic        |
-| `@page-agent/page-controller` | DOM operations and visual feedback |
-| `@page-agent/ui`              | Panel and i18n                     |
+| Package                                 | Description                                   |
+| --------------------------------------- | --------------------------------------------- |
+| `@kylebrodeur/page-agent`               | Main headless entry (Core + PageController)   |
+| `@kylebrodeur/page-agent-core`          | Core agent logic without UI                   |
+| `@kylebrodeur/page-agent-llms`          | LLM client with retry logic                   |
+| `@kylebrodeur/page-agent-page-controller` | DOM operations and visual feedback            |
+| `@kylebrodeur/page-agent-ui`              | Optional Panel and i18n                       |
 
 ### Known Limitations
 
