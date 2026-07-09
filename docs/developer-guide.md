@@ -10,16 +10,16 @@ For contribution rules and expectations, see [../CONTRIBUTING.md](../CONTRIBUTIN
 
 1. **Prerequisites**
     - `macOS` / `Linux` / `WSL`
-    - `node.js ^22.22.1 || >=24` with `pnpm ^11.7.0`
+    - `node.js >=22` with `pnpm ^11.7.0`
     - An editor that supports `ts/eslint/prettier`
     - Make sure `eslint`, `prettier` and `commitlint` work well. Un-linted code won't pass the CI.
 
 2. **Setup**
 
     ```bash
-    pnpm install     # Or `pnpm install --frozen-lockfile` if you don't want to change the lockfile
-    pnpm start       # Start website dev server
-    pnpm run build   # Build everything
+    pnpm install         # Or `pnpm install --frozen-lockfile` if you don't want to change the lockfile
+    pnpm run dev:demo    # Serve the IIFE demo build with auto-rebuild
+    pnpm run build       # Build everything
     ```
 
 ## 📦 Project Structure
@@ -32,13 +32,11 @@ Published packages:
 - **Core** (`packages/core/`) - Core agent logic without UI (npm: `@kylebrodeur/page-agent-core`)
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model (npm: `@kylebrodeur/page-agent-llms`)
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback, independent of LLM (npm: `@kylebrodeur/page-agent-page-controller`)
-- **UI** (`packages/ui/`) - Optional Panel and i18n, decoupled from PageAgent (npm: `@kylebrodeur/page-agent-ui`)
 - **MCP** (`packages/mcp/`) - MCP server for browser control via Page Agent extension (npm: `@kylebrodeur/page-agent-mcp`)
 
 Applications:
 
-- **Extension** (`packages/extension/`) - Browser extension (WXT + React)
-- **Website** (`packages/website/`) - React docs, landing page, and dev playground (private)
+- **Extension** (`packages/extension/`) - Browser extension (WXT + React, private)
 
 > Source-first monorepo with `pnpm workspaces + ts references + vite alias`. Library `package.json` exports point to `src/*.ts` during development, and point to `dist/*.js` when published. The order in `pnpm-workspace.yaml` should follow the topological build order.
 
@@ -98,8 +96,25 @@ pnpm run build:ext
 
 > Warning: AK in your local `.env` will be inlined in the iife script. Be very careful when you distribute the script.
 
-### Adding Documentation
+### Documentation
 
-Ask an AI to help you add documentation to the `website/` package. Follow the existing style.
+All docs live in this repo as markdown: the root [README.md](../README.md) (usage, headless architecture) and `docs/`. Keep them in sync with code changes — there is no docs website.
 
-> Our AGENTS.md file and guardrails are designed for this purpose. But please be careful and review anything AI generated.
+## 📦 Publishing
+
+```bash
+pnpm run version 1.x.0   # sync version to all packages + workspace cross-deps
+pnpm build:libs
+pnpm publish:libs        # ordered publish; token fetched from 1Password via `op`
+```
+
+`scripts/publish.js` skips already-published versions and always restores manifests, so it is safe to re-run after a partial failure. Git checks stay active — commit before publishing.
+
+## 🔀 Upstream Syncs
+
+This fork tracks [alibaba/page-agent](https://github.com/alibaba/page-agent). After a merge or rebase from upstream, `.husky/post-merge` automatically:
+
+- purges upstream-only content (website, ui, zh docs) via `scripts/post-merge-cleanup.js`
+- re-applies the `@kylebrodeur` scope translation via `scripts/apply-scope.js` (index: `scripts/scope-map.js`)
+
+Both scripts are idempotent and can be run manually at any time.

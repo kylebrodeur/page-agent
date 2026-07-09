@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a **monorepo** with npm workspaces:
+This is a **monorepo** with pnpm workspaces:
 
 - **Page Agent** (`packages/page-agent/`) - Headless main entry (core + controller), published as `@kylebrodeur/page-agent` on npm
 - **Extension** (`packages/extension/`) - Browser extension (WXT + React)
@@ -16,12 +16,12 @@ Internal packages:
 ## Development Commands
 
 ```bash
-npm run build                  # Build all packages
-npm run build:libs             # Build all libraries
-npm run build:ext              # Build and zip the extension package
-npm run typecheck              # Typecheck all packages
-npm run test                   # Run unit tests across all workspaces
-npm run lint                   # ESLint
+pnpm run build                 # Build all packages
+pnpm run build:libs            # Build all libraries
+pnpm run build:ext             # Build and zip the extension package
+pnpm run typecheck             # Typecheck all packages
+pnpm test                      # Run unit tests across all workspaces
+pnpm run lint                  # ESLint
 ```
 
 ## Architecture
@@ -40,7 +40,7 @@ packages/
 └── page-controller/         # @kylebrodeur/page-agent-page-controller
 ```
 
-`workspaces` in `package.json` must be in topological order.
+The `packages` order in `pnpm-workspace.yaml` must be topological.
 
 ### Module Boundaries
 
@@ -125,14 +125,14 @@ const pageInfo = await this.pageController.getPageInfo()
 
 - **Framework**: Vitest (unit tests only for now; future E2E goes to `packages/e2e/` with Playwright)
 - **Location**: co-located, `src/foo.test.ts` next to `src/foo.ts`
-- **Coverage today**: `packages/llms` only — other packages will follow incrementally
-- **Adding tests to a new package**: create `vitest.config.ts` in the package and add a `"test": "vitest run"` script. Root `npm test` and `node scripts/ci.js` pick it up through npm workspaces.
+- **Coverage today**: `packages/llms` and `packages/core` — other packages will follow incrementally
+- **Adding tests to a new package**: create `vitest.config.ts` in the package and add a `"test": "vitest run"` script. Root `pnpm test` and `node scripts/ci.js` pick it up through pnpm workspaces.
 - **Template**: See @kylebrodeur/page-agent-llms
 
 ```bash
-npm test                            # all packages with a test script
-npm test -w @kylebrodeur/page-agent-llms        # single package
-cd packages/llms && npx vitest      # watch mode in one package
+pnpm test                                              # all packages with a test script
+pnpm --filter @kylebrodeur/page-agent-llms test        # single package
+cd packages/llms && pnpm exec vitest                   # watch mode in one package
 ```
 
 ## Code Standards

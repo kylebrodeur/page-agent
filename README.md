@@ -1,58 +1,143 @@
 # Page Agent
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://page-agent.github.io/assets/readme/banner-dark.png">
-  <img alt="Page Agent Banner" src="https://page-agent.github.io/assets/readme/banner-light.png">
-</picture>
-
 [![CI](https://img.shields.io/github/actions/workflow/status/kylebrodeur/page-agent/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/kylebrodeur/page-agent/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/@kylebrodeur/page-agent?style=flat-square&label=npm)](https://www.npmjs.com/package/@kylebrodeur/page-agent)
-[![downloads](https://img.shields.io/npm/dt/@kylebrodeur/page-agent?style=flat-square)](https://www.npmjs.com/package/@kylebrodeur/page-agent)
-[![size](https://img.shields.io/bundlephobia/minzip/@kylebrodeur/page-agent?style=flat-square&label=size)](https://bundlephobia.com/package/@kylebrodeur/page-agent)
 [![license](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://opensource.org/licenses/MIT)
 [![typescript](https://img.shields.io/badge/%3C%2F%3E-typescript-blue?style=flat-square)](http://www.typescriptlang.org/)
-[![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/rating/akldabonmimlicnjlflnapfeklbfemhj?style=flat-square&label=chrome%20rating)](https://chromewebstore.google.com/detail/page-agent-ext/akldabonmimlicnjlflnapfeklbfemhj)
-[![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
 
-The GUI Agent Living in Your Webpage. One script gives any web page its own AI agent.
+**Headless in-page GUI agent.** An LLM operates your web page through natural language — no browser extension, no headless browser, no screenshots. Just in-page JavaScript.
 
-<a href="https://trendshift.io/repositories/22551?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-22551" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/22551" alt="alibaba%2Fpage-agent | Trendshift" width="180"/></a>
+This is a headless-first fork of [alibaba/page-agent](https://github.com/alibaba/page-agent): the built-in UI Panel is removed, so you bring your own interface (React, Arrow.js, vanilla — anything that can listen to DOM events).
 
-🌐 **English** | [中文](./docs/README-zh.md)
+## Packages
 
-<a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/docs/introduction/overview" target="_blank"><b>📖 Docs</b></a> | <a href="https://news.ycombinator.com/item?id=47264138" target="_blank"><b>📢 HN Discussion</b></a> | <a href="https://x.com/simonluvramen" target="_blank"><b>𝕏 Follow on X</b></a>
+| Package                                   | What it is                                                                    |
+| ----------------------------------------- | ----------------------------------------------------------------------------- |
+| `@kylebrodeur/page-agent`                 | Headless entry point. `PageAgentCore` wired to the default `PageController`   |
+| `@kylebrodeur/page-agent-core`            | The agent loop alone — bring your own `PageController`                        |
+| `@kylebrodeur/page-agent-page-controller` | DOM observation, element actions, and the visual `SimulatorMask`              |
+| `@kylebrodeur/page-agent-llms`            | OpenAI-compatible LLM client with reflection-before-action and retry          |
+| `@kylebrodeur/page-agent-mcp`             | MCP server that drives the browser extension ([docs](packages/mcp/README.md)) |
 
-<!-- demo video -->
+## Quick Start
 
-[![Watch the demo](https://page-agent.github.io/assets/readme/poster.jpg)](https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2)
+```bash
+pnpm add @kylebrodeur/page-agent
+```
 
----
+```typescript
+import { PageAgent } from '@kylebrodeur/page-agent'
 
-## ✨ Features
+const agent = new PageAgent({
+    model: 'qwen3.5-plus',
+    baseURL: 'https://api.your-llm-provider.com/v1',
+    apiKey: 'YOUR_API_KEY',
+    language: 'en-US',
+    enableMask: true, // visual overlay while the agent works (default: true)
+})
 
-- **🎯 Easy integration**
-    - No need for `browser extension` / `python` / `headless browser`.
-    - Just in-page javascript. Everything happens in your web page.
-- **📖 Text-based DOM manipulation**
-    - No screenshots. No multi-modal LLMs or special permissions needed.
-- **🧠 Bring your own LLMs**
-    - Works with most mainstream models, including locally deployed ones. See [supported models](https://alibaba.github.io/page-agent/docs/features/models).
-- **🐙 Optional [chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension) for multi-page tasks.**
-    - And an [MCP Server (Beta)](https://alibaba.github.io/page-agent/docs/features/mcp-server) to control it from outside
+const result = await agent.execute('Click the login button')
+// result: { success: boolean, data: string, history: HistoricalEvent[] }
+```
 
-## 💡 Use Cases
+Works with any OpenAI-compatible endpoint, including local models (Ollama etc.).
 
-- **SaaS AI Copilot** — Ship an AI copilot in your product in lines of code. No backend rewrite.
-- **Smart Form Filling** — Turn 20-click workflows into one sentence. Perfect for ERP, CRM, and admin systems.
-- **Accessibility** — Make any web app accessible through natural language. Voice commands, screen readers, zero barrier.
-- **Multi-page Agent** — Extend your own web agent's reach across browser tabs via the [Chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension).
-- **MCP** - Allow your agent clients to control your browser.
+## How Headless Works
 
-## 🚀 Quick Start
+`PageAgent` = `PageAgentCore` (the agent loop) + `PageController` (DOM access). There is no UI code in any published package — the agent reports everything through events, and you render them however you want.
 
-### One-line integration
+The loop is ReAct-style, up to `maxSteps` (default 40):
 
-Fastest way to try PageAgent with our free Demo LLM:
+```mermaid
+flowchart LR
+  O[observe<br/>extract + simplify DOM] --> T[think<br/>LLM: reflection + action]
+  T --> A[act<br/>click / input / scroll ...]
+  A --> O
+```
+
+### Building your own UI
+
+`PageAgentCore` extends `EventTarget`. Everything a panel needs comes from four events:
+
+| Event           | Payload                                                                        | Use for                                    |
+| --------------- | ------------------------------------------------------------------------------ | ------------------------------------------ |
+| `statuschange`  | read `agent.status`: `idle \| running \| completed \| error \| stopped`        | start/stop buttons, spinners               |
+| `activity`      | `CustomEvent.detail`: `thinking`, `executing`, `executed`, `retrying`, `error` | live feedback line (transient, not memory) |
+| `historychange` | read `agent.history`: steps, observations, errors (agent memory)               | step-by-step transcript                    |
+| `dispose`       | —                                                                              | teardown                                   |
+
+```typescript
+agent.addEventListener('statuschange', () => render(agent.status))
+
+agent.addEventListener('activity', (e) => {
+    const activity = (e as CustomEvent).detail
+    if (activity.type === 'executing') showToast(`${activity.tool}...`)
+})
+
+agent.addEventListener('historychange', () => renderTranscript(agent.history))
+
+// Let the agent ask the user questions (enables the ask_user tool):
+agent.onAskUser = async (question) => window.prompt(question) || ''
+
+// Stop from your UI:
+await agent.stop()
+```
+
+## Configuration
+
+All of `PageAgentConfig` (main package) = `AgentConfig` + `PageControllerConfig`:
+
+| Field                                                           | Default | Description                                              |
+| --------------------------------------------------------------- | ------- | -------------------------------------------------------- |
+| `baseURL`, `model`                                              | —       | OpenAI-compatible endpoint and model (required)          |
+| `apiKey`                                                        | —       | API key                                                  |
+| `language`                                                      | `zh-CN` | Agent language (`en-US` \| `zh-CN`)                      |
+| `maxSteps`                                                      | `40`    | Step budget per task                                     |
+| `stepDelay`                                                     | `0.4`   | Seconds between steps                                    |
+| `enableMask`                                                    | `true`  | Visual overlay blocking user input while running         |
+| `maxRetries`                                                    | —       | LLM retry attempts                                       |
+| `instructions.system`                                           | —       | Extra system-level instructions for every task           |
+| `instructions.getPageInstructions`                              | —       | Per-URL instructions, called before each step            |
+| `customTools`                                                   | —       | Add, override, or remove (set `null`) agent tools        |
+| `transformPageContent`                                          | —       | Hook to inspect/mask page text before it reaches the LLM |
+| `onBeforeTask` / `onAfterTask` / `onBeforeStep` / `onAfterStep` | —       | Lifecycle hooks (experimental)                           |
+
+### Custom tools
+
+```typescript
+import { tool } from '@kylebrodeur/page-agent'
+import * as z from 'zod/v4'
+
+const agent = new PageAgent({
+    // ...llm config
+    customTools: {
+        get_weather: tool({
+            description: 'Get the current weather for a city.',
+            inputSchema: z.object({ city: z.string() }),
+            execute: async ({ city }) => `Sunny in ${city}`,
+        }),
+        ask_user: null, // remove a built-in tool
+    },
+})
+```
+
+### Custom PageController (advanced)
+
+`@kylebrodeur/page-agent-core` takes any object implementing the `PageController` contract, so the same agent loop can drive other targets (an iframe, a remote tab, a test harness):
+
+```typescript
+import { PageAgentCore } from '@kylebrodeur/page-agent-core'
+import { PageController } from '@kylebrodeur/page-agent-page-controller'
+
+const agent = new PageAgentCore({
+    // ...llm config
+    pageController: new PageController({ enableMask: true }),
+})
+```
+
+## IIFE Demo Build
+
+The main package also ships a self-initializing IIFE (`dist/iife/page-agent.demo.js`) for quick evaluation on any page:
 
 ```html
 <script
@@ -61,68 +146,27 @@ Fastest way to try PageAgent with our free Demo LLM:
 ></script>
 ```
 
-> **⚠️ For technical evaluation only.** This demo CDN uses our free [testing LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api). By using it, you agree to its [terms](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md).
+Query params: `?autoInit=false` (load without creating an agent — then `new window.PageAgent(...)` yourself), `model`, `baseURL`, `apiKey`, `lang`.
 
-| Mirrors | URL                                                                                                     |
-| ------- | ------------------------------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/@kylebrodeur/page-agent@1.11.0/dist/iife/page-agent.demo.js               |
-| China   | https://registry.npmmirror.com/@kylebrodeur/page-agent/1.11.0/files/dist/iife/page-agent.demo.js      |
+> **⚠️ Evaluation only.** Without explicit config it falls back to upstream's free testing LLM endpoint; see the [terms](docs/terms-and-privacy.md).
 
-Add `?autoInit=false` to load the script without creating the demo agent automatically. You can then instantiate it with `new window.PageAgent(...)`.
+## Development
 
-### NPM Installation
+See [docs/developer-guide.md](docs/developer-guide.md) for local workflows, and [CONTRIBUTING.md](CONTRIBUTING.md) for contribution rules.
 
 ```bash
-pnpm add @kylebrodeur/page-agent
+pnpm install
+pnpm build:libs      # build all publishable packages
+pnpm test            # unit tests
+pnpm publish:libs    # publish (ordered, token via 1Password)
 ```
 
-```javascript
-import { PageAgent } from '@kylebrodeur/page-agent'
+## License
 
-const agent = new PageAgent({
-    model: 'qwen3.5-plus',
-    baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-    apiKey: 'YOUR_API_KEY',
-    language: 'en-US',
-})
+[MIT](LICENSE)
 
-await agent.execute('Click the login button')
-```
+## Acknowledgments
 
-> The `page-agent` package is now headless and does not include the built-in UI Panel. You can use it with any framework (Arrow.js, React, vanilla JS, etc.) and build your own interface, or install `@kylebrodeur/page-agent-ui` separately if you want the provided Panel.
+Fork of [alibaba/page-agent](https://github.com/alibaba/page-agent) by Simon ([@gaomeng1900](https://github.com/gaomeng1900)).
 
-For more programmatic usage, see [📖 Documentations](https://alibaba.github.io/page-agent/docs/introduction/overview).
-
-## 🤝 Contributing
-
-We welcome contributions from the community! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and [docs/developer-guide.md](docs/developer-guide.md) for local development workflows.
-
-Built something cool with PageAgent? Share it in [Show and Tell](https://github.com/alibaba/page-agent/discussions/categories/show-and-tell). 🙌
-
-Please read the [maintainer's note](https://github.com/alibaba/page-agent/issues/349) on principles and current state.
-
-Contributions generated entirely by **bots or AI** without substantial human involvement will **not be accepted**.
-
-## ⚖️ License
-
-[MIT License](LICENSE)
-
-## 👏 Acknowledgments
-
-This project builds upon the excellent work of **[`browser-use`](https://github.com/browser-use/browser-use)**.
-
-`PageAgent` is designed for **client-side web enhancement**, not server-side automation.
-
-```
-DOM processing components and prompt are derived from browser-use:
-
-Browser Use <https://github.com/browser-use/browser-use>
-Copyright (c) 2024 Gregor Zunic
-Licensed under the MIT License
-
-We gratefully acknowledge the browser-use project and its contributors for their
-excellent work on web automation and DOM interaction patterns that helped make
-this project possible.
-```
-
-**⭐ Star this repo if you find PageAgent helpful!**
+DOM processing components and prompts are derived from [browser-use](https://github.com/browser-use/browser-use) (MIT, Copyright (c) 2024 Gregor Zunic). We gratefully acknowledge both projects.
