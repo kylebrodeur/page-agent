@@ -41,7 +41,6 @@
         "@kylebrodeur/page-agent-core": "workspace:1.11.0",
         "@kylebrodeur/page-agent-llms": "workspace:1.11.0",
         "@kylebrodeur/page-agent-page-controller": "workspace:1.11.0",
-        "@kylebrodeur/page-agent-ui": "workspace:1.11.0",
         "ai-motion": "^0.4.8",
         "chalk": "^5.6.2"
     },

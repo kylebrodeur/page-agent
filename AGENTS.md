@@ -4,21 +4,18 @@
 
 This is a **monorepo** with npm workspaces:
 
-- **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel, published as `page-agent` on npm
+- **Page Agent** (`packages/page-agent/`) - Headless main entry (core + controller), published as `@kylebrodeur/page-agent` on npm
 - **Extension** (`packages/extension/`) - Browser extension (WXT + React)
-- **Website** (`packages/website/`) - React docs and landing page. **When working on website, follow `packages/website/AGENTS.md`**
 
 Internal packages:
 
-- **Core** (`packages/core/`) - PageAgentCore without UI (npm: `@page-agent/core`)
+- **Core** (`packages/core/`) - PageAgentCore (npm: `@kylebrodeur/page-agent-core`)
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback (SimulatorMask), independent of LLM
-- **UI** (`packages/ui/`) - Panel and i18n. Decoupled from PageAgent
 
 ## Development Commands
 
 ```bash
-npm start                      # Start website dev server
 npm run build                  # Build all packages
 npm run build:libs             # Build all libraries
 npm run build:ext              # Build and zip the extension package
@@ -35,23 +32,21 @@ Source-first monorepo: library `package.json` exports point to `src/*.ts` during
 
 ```
 packages/
-├── core/                    # npm: "@page-agent/core" ⭐ Core agent logic (headless)
-├── page-agent/              # npm: "page-agent" entry class (with UI + controller + demo builds)
-├── website/                 # @page-agent/website (private)
-├── llms/                    # @page-agent/llms
-├── extension/               # Browser extension
-├── page-controller/         # @page-agent/page-controller
-└── ui/                      # @page-agent/ui
+├── core/                    # npm: "@kylebrodeur/page-agent-core" ⭐ Core agent logic (headless)
+├── page-agent/              # npm: "@kylebrodeur/page-agent" headless entry (controller + demo builds)
+├── llms/                    # @kylebrodeur/page-agent-llms
+├── extension/               # Browser extension (private)
+├── mcp/                     # @kylebrodeur/page-agent-mcp
+└── page-controller/         # @kylebrodeur/page-agent-page-controller
 ```
 
 `workspaces` in `package.json` must be in topological order.
 
 ### Module Boundaries
 
-- **Page Agent**: Main entry with UI. Extends PageAgentCore and adds Panel. Imports from `@page-agent/core`, `@page-agent/ui`
-- **Core**: PageAgentCore without UI. Imports from `@page-agent/llms`, `@page-agent/page-controller`
+- **Page Agent**: Headless main entry. Extends PageAgentCore with the default PageController. Imports from `@kylebrodeur/page-agent-core`, `@kylebrodeur/page-agent-page-controller`
+- **Core**: PageAgentCore. Imports from `@kylebrodeur/page-agent-llms`, `@kylebrodeur/page-agent-page-controller`
 - **LLMs**: LLM client with MacroToolInput contract. No dependency on page-agent
-- **UI**: Panel and i18n. Decoupled from PageAgent via PanelAgentAdapter interface
 - **Page Controller**: DOM operations with optional visual feedback (SimulatorMask). No LLM dependency. Enable mask via `enableMask: true` config
 
 ### PageController ↔ PageAgent Communication
@@ -81,10 +76,10 @@ const pageInfo = await this.pageController.getPageInfo()
 
 ### Page Agent (`packages/page-agent/`)
 
-| File               | Description                                  |
-| ------------------ | -------------------------------------------- |
-| `src/PageAgent.ts` | ⭐ Main class with UI, extends PageAgentCore |
-| `src/demo.ts`      | IIFE demo entry (auto-init with demo API)    |
+| File               | Description                                   |
+| ------------------ | --------------------------------------------- |
+| `src/PageAgent.ts` | ⭐ Headless main class, extends PageAgentCore |
+| `src/demo.ts`      | IIFE demo entry (auto-init with demo API)     |
 
 ### Core (`packages/core/`)
 
@@ -132,11 +127,11 @@ const pageInfo = await this.pageController.getPageInfo()
 - **Location**: co-located, `src/foo.test.ts` next to `src/foo.ts`
 - **Coverage today**: `packages/llms` only — other packages will follow incrementally
 - **Adding tests to a new package**: create `vitest.config.ts` in the package and add a `"test": "vitest run"` script. Root `npm test` and `node scripts/ci.js` pick it up through npm workspaces.
-- **Template**: See @page-agent/llms
+- **Template**: See @kylebrodeur/page-agent-llms
 
 ```bash
 npm test                            # all packages with a test script
-npm test -w @page-agent/llms        # single package
+npm test -w @kylebrodeur/page-agent-llms        # single package
 cd packages/llms && npx vitest      # watch mode in one package
 ```
 

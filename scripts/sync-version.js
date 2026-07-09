@@ -54,7 +54,7 @@ let hasChanges = !!versionArg
  * Check if a dependency name is a page-agent internal package
  */
 function isInternalPackage(name) {
-	return name === 'page-agent' || name.startsWith('@page-agent/')
+	return name === '@kylebrodeur/page-agent' || name.startsWith('@kylebrodeur/page-agent-')
 }
 
 /**
@@ -65,8 +65,10 @@ function updateInternalDeps(deps, newVersion) {
 	if (!deps) return false
 	let changed = false
 	for (const [name, version] of Object.entries(deps)) {
-		if (isInternalPackage(name) && version !== newVersion) {
-			deps[name] = newVersion
+		if (!isInternalPackage(name)) continue
+		const target = version.startsWith('workspace:') ? `workspace:${newVersion}` : newVersion
+		if (version !== target) {
+			deps[name] = target
 			changed = true
 		}
 	}
@@ -105,10 +107,10 @@ for (const pkg of packages) {
 }
 
 // Update CDN URLs in documentation and source files
-const CDN_DEMO_URL_OLD = `https://cdn.jsdelivr.net/npm/page-agent@${oldVersion}/dist/iife/page-agent.demo.js`
-const CDN_DEMO_URL_NEW = `https://cdn.jsdelivr.net/npm/page-agent@${newVersion}/dist/iife/page-agent.demo.js`
-const CDN_DEMO_CN_URL_OLD = `https://registry.npmmirror.com/page-agent/${oldVersion}/files/dist/iife/page-agent.demo.js`
-const CDN_DEMO_CN_URL_NEW = `https://registry.npmmirror.com/page-agent/${newVersion}/files/dist/iife/page-agent.demo.js`
+const CDN_DEMO_URL_OLD = `https://cdn.jsdelivr.net/npm/@kylebrodeur/page-agent@${oldVersion}/dist/iife/page-agent.demo.js`
+const CDN_DEMO_URL_NEW = `https://cdn.jsdelivr.net/npm/@kylebrodeur/page-agent@${newVersion}/dist/iife/page-agent.demo.js`
+const CDN_DEMO_CN_URL_OLD = `https://registry.npmmirror.com/@kylebrodeur/page-agent/${oldVersion}/files/dist/iife/page-agent.demo.js`
+const CDN_DEMO_CN_URL_NEW = `https://registry.npmmirror.com/@kylebrodeur/page-agent/${newVersion}/files/dist/iife/page-agent.demo.js`
 
 const filesToUpdateCdn = ['README.md', 'docs/README-zh.md', 'packages/website/src/constants.ts']
 

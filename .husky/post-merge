@@ -1,0 +1,2 @@
+node scripts/post-merge-cleanup.js
+node scripts/apply-scope.js

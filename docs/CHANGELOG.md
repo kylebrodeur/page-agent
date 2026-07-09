@@ -50,14 +50,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
-- **Robust abort handling** - Rewrote the aborting system; sync tools, loop execution, and LLM clients now correctly respect task abort signals (`ctx.signal`). Also decoupled `AbortError` from `InvokeError` in `@page-agent/llms`.
+- **Robust abort handling** - Rewrote the aborting system; sync tools, loop execution, and LLM clients now correctly respect task abort signals (`ctx.signal`). Also decoupled `AbortError` from `InvokeError` in `@kylebrodeur/page-agent-llms`.
 - **Claude Opus 4.8 support** - Added support for Claude Opus 4.8 model.
 
 ### Improvements
 
 - **Concurrency guard** - Prevented concurrent `execute()` calls on a single PageAgent/Core instance to avoid race conditions.
 - **Model recommendations refresh** - Updated default and tested model list recommendations.
-- **Test coverage** - Added comprehensive Vitest unit tests for the `@page-agent/llms` package.
+- **Test coverage** - Added comprehensive Vitest unit tests for the `@kylebrodeur/page-agent-llms` package.
 - **Improved documentation** - Added website documentation for the `ctx.signal` abort contract and `execute()` concurrency rules.
 
 ### Bug Fixes
@@ -170,7 +170,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
-- **Beta MCP support** - New `@page-agent/mcp` package lets MCP clients such as Claude Desktop and Copilot control the browser through the Page Agent extension
+- **Beta MCP support** - New `@kylebrodeur/page-agent-mcp` package lets MCP clients such as Claude Desktop and Copilot control the browser through the Page Agent extension
 - **Better iframe handling** - Same-origin iframe elements are handled more reliably during DOM extraction and actions
 - **Extension history workflows** - Users can rerun past tasks, export history sessions as JSON, and approve MCP-triggered tasks before execution
 
@@ -236,8 +236,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Unified zod imports (`* as z`) across all packages for consistency
 - Better Zod error formatting with `z.prettifyError()` in LLM client
-- Exported `InvokeError` and `InvokeErrorType` as values (not just types) from `@page-agent/llms`
-- Exported `SupportedLanguage` type from `@page-agent/core`
+- Exported `InvokeError` and `InvokeErrorType` as values (not just types) from `@kylebrodeur/page-agent-llms`
+- Exported `SupportedLanguage` type from `@kylebrodeur/page-agent-core`
 
 ### Extension v0.1.8
 
@@ -341,13 +341,13 @@ PageAgent is now ready for production use. The API is stable and breaking change
 
 ### Packages
 
-| Package                                 | Description                                   |
-| --------------------------------------- | --------------------------------------------- |
-| `@kylebrodeur/page-agent`               | Main headless entry (Core + PageController)   |
-| `@kylebrodeur/page-agent-core`          | Core agent logic without UI                   |
-| `@kylebrodeur/page-agent-llms`          | LLM client with retry logic                   |
-| `@kylebrodeur/page-agent-page-controller` | DOM operations and visual feedback            |
-| `@kylebrodeur/page-agent-ui`              | Optional Panel and i18n                       |
+| Package                                   | Description                                 |
+| ----------------------------------------- | ------------------------------------------- |
+| `@kylebrodeur/page-agent`                 | Main headless entry (Core + PageController) |
+| `@kylebrodeur/page-agent-core`            | Core agent logic without UI                 |
+| `@kylebrodeur/page-agent-llms`            | LLM client with retry logic                 |
+| `@kylebrodeur/page-agent-page-controller` | DOM operations and visual feedback          |
+| `@kylebrodeur/page-agent-ui`              | Optional Panel and i18n                     |
 
 ### Known Limitations
 

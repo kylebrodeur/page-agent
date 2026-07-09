@@ -47,7 +47,6 @@ jobs:
           fi
           pnpm --filter @kylebrodeur/page-agent-llms publish --access public $PUBLISH_TAG_ARGS
           pnpm --filter @kylebrodeur/page-agent-page-controller publish --access public $PUBLISH_TAG_ARGS
-          pnpm --filter @kylebrodeur/page-agent-ui publish --access public $PUBLISH_TAG_ARGS
           pnpm --filter @kylebrodeur/page-agent-core publish --access public $PUBLISH_TAG_ARGS
           pnpm --filter @kylebrodeur/page-agent publish --access public $PUBLISH_TAG_ARGS
           pnpm --filter @kylebrodeur/page-agent-mcp publish --access public $PUBLISH_TAG_ARGS

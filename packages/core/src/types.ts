@@ -1,4 +1,4 @@
-import type { LLMConfig } from '@page-agent/llms'
+import type { LLMConfig } from '@kylebrodeur/page-agent-llms'
 
 // @note circular dependency but okay
 import type { PageAgentCore } from './PageAgentCore'

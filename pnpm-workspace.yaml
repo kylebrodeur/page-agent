@@ -1,12 +1,14 @@
 packages:
   - packages/page-controller
-  - packages/ui
   - packages/llms
   - packages/core
   - packages/page-agent
   - packages/mcp
   - packages/extension
-  - packages/website
+
+allowBuilds:
+  esbuild: true
+  spawn-sync: true
 
 ignoreScripts: false
 

@@ -1,4 +1,4 @@
-import type { HistoricalEvent } from '@page-agent/core'
+import type { HistoricalEvent } from '@kylebrodeur/page-agent-core'
 
 const EXPORT_FILE_PREFIX = 'page-agent-history'
 const MAX_TASK_SLUG_LENGTH = 40
