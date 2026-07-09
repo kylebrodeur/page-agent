@@ -141,7 +141,7 @@ The main package also ships a self-initializing IIFE (`dist/iife/page-agent.demo
 
 ```html
 <script
-    src="https://cdn.jsdelivr.net/npm/@kylebrodeur/page-agent@1.12.0/dist/iife/page-agent.demo.js"
+    src="https://cdn.jsdelivr.net/npm/@kylebrodeur/page-agent@1.13.0/dist/iife/page-agent.demo.js"
     crossorigin="anonymous"
 ></script>
 ```

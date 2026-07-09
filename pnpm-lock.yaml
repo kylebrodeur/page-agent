@@ -84,10 +84,10 @@ importers:
   packages/core:
     dependencies:
       '@kylebrodeur/page-agent-llms':
-        specifier: workspace:*
+        specifier: workspace:1.13.0
         version: link:../llms
       '@kylebrodeur/page-agent-page-controller':
-        specifier: workspace:*
+        specifier: workspace:1.13.0
         version: link:../page-controller
       chalk:
         specifier: ^5.6.2
@@ -100,13 +100,13 @@ importers:
   packages/extension:
     dependencies:
       '@kylebrodeur/page-agent-core':
-        specifier: workspace:*
+        specifier: workspace:1.13.0
         version: link:../core
       '@kylebrodeur/page-agent-llms':
-        specifier: workspace:*
+        specifier: workspace:1.13.0
         version: link:../llms
       '@kylebrodeur/page-agent-page-controller':
-        specifier: workspace:*
+        specifier: workspace:1.13.0
         version: link:../page-controller
       ai-motion:
         specifier: ^0.4.8
@@ -222,13 +222,13 @@ importers:
   packages/page-agent:
     dependencies:
       '@kylebrodeur/page-agent-core':
-        specifier: workspace:*
+        specifier: workspace:1.13.0
         version: link:../core
       '@kylebrodeur/page-agent-llms':
-        specifier: workspace:*
+        specifier: workspace:1.13.0
         version: link:../llms
       '@kylebrodeur/page-agent-page-controller':
-        specifier: workspace:*
+        specifier: workspace:1.13.0
         version: link:../page-controller
       chalk:
         specifier: ^5.6.2

@@ -1,7 +1,7 @@
 {
     "name": "@kylebrodeur/page-agent",
     "private": false,
-    "version": "1.12.0",
+    "version": "1.13.0",
     "type": "module",
     "main": "./src/PageAgent.ts",
     "types": "./src/PageAgent.ts",
@@ -54,9 +54,9 @@
         "postpublish": "node ../../scripts/post-publish.js"
     },
     "dependencies": {
-        "@kylebrodeur/page-agent-core": "workspace:*",
-        "@kylebrodeur/page-agent-llms": "workspace:*",
-        "@kylebrodeur/page-agent-page-controller": "workspace:*",
+        "@kylebrodeur/page-agent-core": "workspace:1.13.0",
+        "@kylebrodeur/page-agent-llms": "workspace:1.13.0",
+        "@kylebrodeur/page-agent-page-controller": "workspace:1.13.0",
         "chalk": "^5.6.2"
     },
     "peerDependencies": {

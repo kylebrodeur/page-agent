@@ -1,7 +1,7 @@
 {
     "name": "@kylebrodeur/page-agent-ext",
     "private": true,
-    "version": "1.12.0",
+    "version": "1.13.0",
     "type": "module",
     "scripts": {
         "dev": "wxt",
@@ -38,9 +38,9 @@
         "wxt": "^0.20.27"
     },
     "dependencies": {
-        "@kylebrodeur/page-agent-core": "workspace:*",
-        "@kylebrodeur/page-agent-llms": "workspace:*",
-        "@kylebrodeur/page-agent-page-controller": "workspace:*",
+        "@kylebrodeur/page-agent-core": "workspace:1.13.0",
+        "@kylebrodeur/page-agent-llms": "workspace:1.13.0",
+        "@kylebrodeur/page-agent-page-controller": "workspace:1.13.0",
         "ai-motion": "^0.4.8",
         "chalk": "^5.6.2"
     },
