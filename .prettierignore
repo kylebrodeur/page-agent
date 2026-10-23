@@ -3,6 +3,7 @@
 
 # Generated
 packages/extension/.wxt
+pnpm-lock.yaml
 
 # Vendored
 **/components/ui
