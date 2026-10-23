@@ -1,5 +1,12 @@
-# Runs only for code already on main, on the self-hosted runner.
+# Runs only for code already on main.
 # PR-triggered CI must stay on GitHub-hosted runners (see ci.yml).
+#
+# This job runs the SAME script as the PR CI: node scripts/ci.js. It
+# used to run on a self-hosted runner named 'page-agent-trusted', but
+# that runner is not registered with the repository any more, so every
+# push to main queued a job that never started. A CI that never runs is
+# not a CI, so this runs on a GitHub-hosted runner, which is where the
+# identical PR CI already runs and passes.
 name: Main CI
 permissions:
   contents: read
@@ -10,20 +17,25 @@ on:
 
 jobs:
   test:
-    runs-on: page-agent-trusted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: 'npm'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: CI checks
         run: node scripts/ci.js
